@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Header, Body
+from fastapi import APIRouter, Header, Body, \
+    HTTPException, status
 from typing import Annotated
 from pydantic import BaseModel
 
@@ -18,4 +19,16 @@ def test(
     id: Annotated[str, Header()],
     input_body: Annotated[list[BodyInput], Body()]
 ):
-    return input_body
+
+    lst = [x for x in input_body \
+            if (x.BodyIdNumber.isdigit()) \
+            and (number == int(x.BodyIdNumber)) \
+            and (id == x.BodyId)]
+
+    if lst:
+        return lst
+
+    raise HTTPException(
+        status_code = status.HTTP_404_NOT_FOUND,
+        detail = "not found",
+    )
